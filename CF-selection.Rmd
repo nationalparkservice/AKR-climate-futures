@@ -1,5 +1,5 @@
 ---
-title: "Summarizing T1 metrics for whole climate region"
+title: "Selecting CFs for park"
 author: "Amber Runyon"
 date: "6/29/2021"
 output: html_document
@@ -16,7 +16,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 rm(list = ls())
 
-library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(ggbiplot)
+library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang)
+
+SiteID <- "KLGO"
 
 area <- 'wrst_simple' #wrst_mtns, copper_plateau, coastal_mtns, eastern_coast
 
