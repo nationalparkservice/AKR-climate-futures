@@ -11,29 +11,30 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Initials
+0. Run after CF-selection.Rmd and selection of CFs
+1. Change the initials with area name and CFs selected
+2. 
 
 ```{r Initials, echo=FALSE, message=FALSE, warning=FALSE}
 
 rm(list = ls())
 
-area <- 'WRST_simple' #wrst_mtns, copper_plateau, coastal_mtns, eastern_coast, WRST_simple
+SiteID <- "KEFJ" #*UPDATE*
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(units)
 
-met.dir <- "E:/NCAR_AK/met" 
-vic.dir <- "E:/NCAR_AK/vic_hydro"
+met.dir <- "D:/NCAR_AK/met" 
+vic.dir <- "D:/NCAR_AK/vic_hydro"
 
-working.dir <- "C:/Users/achildress/Documents/wrst_temp"
+working.dir <- paste0("C:/Users/achildress/Documents/wrst_temp/",SiteID) #*UPDATE*
 
-data.dir <- paste(working.dir, "Data", area, sep="/")
-  
-dir.create(data.dir,showWarnings=FALSE)
+data.dir <- paste(working.dir, "Data", sep="/")
 
 historical.period <- as.character(seq(1950,1999,1))
 future.period <- as.character(seq(2025,2055,1))
 daymet.period <- as.character(seq(1980,2016,1))
 
-GCMs <- c("inmcm4.rcp85","ACCESS1-3.rcp45","CanESM2.rcp85")
+GCMs <- c("inmcm4.rcp85","HadGEM2-ES.rcp45","CanESM2.rcp85")
 CFs <- c("Climate Future 1", "Climate Future 2", "Climate Future 3")
 cols <- c("#12045C","#ffcccc","#E10720")
 
@@ -47,11 +48,9 @@ CF_GCM <- data.frame(CF=CFs,GCM=GCMs,CF_col=cols)
 ```{r Load spatial data}
 
 # Spatial
-boundary.dir <- "C:/Users/achildress/DOI/NPS-WRST-Resource Stewardship Strategy - Climate/3.0 Climate futures development (Summer 2021)/Data/Boundary_shapefiles/"
-shp <- st_read(paste0(boundary.dir, area, ".shp")) # Wrangell Mountains
-shp <- st_transform(shp, 3338)
-# plot(st_geometry(shp))
-
+nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
+park <- filter(nps_boundary, UNIT_CODE == SiteID)
+shp <- st_transform(park, 3338)
 
 ```
 

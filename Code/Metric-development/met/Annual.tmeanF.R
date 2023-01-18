@@ -22,7 +22,7 @@ grid_var_stars %>% mutate(tmean_f = tmean * 9/5 + 32) %>% select(tmean_f) -> gri
 
 by_t = "1 year"
 grid <- aggregate(grid_var_stars, by = by_t, FUN = mean, na.omit = TRUE) # Doesn't work in lat/long. Must be projected. Removes units from tmax. Also aggregates to a lower resolution.
-grid <- grid[,2:38,,]
+grid <- grid[,1:length(daymet.period),,]
 grid1 <- split(grid, "time")
 
 df<-data.frame(year=daymet.period,mean=NA)
@@ -75,7 +75,7 @@ for (G in 1:length(GCMs)){
   
   by_t = "1 year"
   hist <- aggregate(hist_var_stars, by = by_t, FUN = mean, na.omit = TRUE) # Doesn't work in lat/long. Must be projected. Removes units from tmax. Also aggregates to a lower resolution.
-  hist <- hist[,2:51,,]
+  hist <- hist[,1:length(historical.period),,]
   # hist1 <- split(hist, "time")
   # 
   # 
@@ -89,7 +89,7 @@ for (G in 1:length(GCMs)){
   
   
   fut <- aggregate(fut_var_stars, by = by_t, FUN = mean, na.omit = TRUE) # Doesn't work in lat/long. Must be projected. Removes units from tmax. Also aggregates to a lower resolution.
-  fut <- fut[,2:32,,]
+  fut <- fut[,1:length(future.period),,]
   fut1 <- split(fut, "time")
   
   df<-data.frame(year=future.period,mean=NA)

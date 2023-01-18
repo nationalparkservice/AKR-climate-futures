@@ -19,7 +19,7 @@ grid_var_stars %>% mutate(pcp_in = pcp / 25.4) %>% select(pcp_in) -> grid_var_st
 # st_get_dimension_values(grid_var_stars,"time") #how get time dimension values
 by_t = "1 year"
 grid <- aggregate(grid_var_stars, by = by_t, FUN = function(x) sum(x) *30) # Doesn't work in lat/long. Must be projected. Removes units from tmax. Also aggregates to a lower resolution.
-grid <- grid[,2:38,,]
+grid <- grid[,1:length(daymet.period),,]
 grid1 <- split(grid, "time")
 
 
@@ -71,7 +71,7 @@ for (G in 1:length(GCMs)){
 
   by_t = "1 year"
   hist <- aggregate(hist_var_stars, by = by_t, FUN = function(x) sum(x) *30) # *30 bc mean daily, want mean monthly
-  hist <- hist[,2:51,,]
+  hist <- hist[,1:length(historical.period),,]
   # hist1 <- split(hist, "time")
   # 
   # 
@@ -85,7 +85,7 @@ for (G in 1:length(GCMs)){
 
   
   fut <- aggregate(fut_var_stars, by = by_t, FUN = function(x) sum(x) *30) # *30 bc mean daily, want mean monthly
-  fut <- fut[,2:32,,]
+  fut <- fut[,1:length(future.period),,]
   fut1 <- split(fut, "time")
   
   df<-data.frame(year=future.period,mean=NA)
