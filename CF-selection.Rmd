@@ -12,27 +12,29 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Initials
 
+_When running - update SiteID then go to end and select CFs after completed_
+
 ```{r Initials, echo=FALSE, message=FALSE, warning=FALSE}
 
 rm(list = ls())
 
-library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang)
+library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(ggbiplot)
 
-SiteID <- "KLGO"
-
-area <- 'wrst_simple' #wrst_mtns, copper_plateau, coastal_mtns, eastern_coast
+SiteID <- "KEFJ" #*UPDATE*
 
 data.dir <- "D:/NCAR_AK/met/monthly/BCSD/" 
 vic.dir <- "D:/NCAR_AK/vic_hydro/monthly/BCSD"
-plot.dir <- paste0("C:/Users/achildress/Documents/wrst_temp/T1-extraction/",area)
+plot.dir <- paste0("C:/Users/achildress/Documents/wrst_temp/",SiteID) #*UPDATE*
 
 dir.create(plot.dir,showWarnings=FALSE)
 
+FigDir <- paste0(plot.dir,"/Figures")
+dir.create(FigDir,showWarnings=FALSE)
+DataOut <- paste0(plot.dir,"/Data")
+dir.create(DataOut,showWarnings=FALSE)
+
 historical.period <- as.character(seq(1950,1999,1))
-future.period <- as.character(seq(2025,2055,1))
-
-
-
+future.period <- as.character(seq(2035,2065,1))
 
 GCMs <- list.files(path = data.dir)
 RCPs <- c("rcp45", "rcp85")
@@ -45,17 +47,15 @@ GCM.RCP <- sort(apply(expand.grid(GCMs, RCPs), 1, paste, collapse="."))
 ```{r Load spatial data}
 
 # Spatial
-boundary.dir <- "C:/Users/achildress/DOI/NPS-WRST-Resource Stewardship Strategy - Climate/Climate futures development/Data/Boundary_shapefiles/"
-shp <- st_read(paste0(boundary.dir, area, ".shp")) # Wrangell Mountains
-shp <- st_transform(shp, 3338)
-# plot(st_geometry(shp))
-
+nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
+park <- filter(nps_boundary, UNIT_CODE == SiteID)
+shp <- st_transform(park, 3338)
 
 ```
 Create empty dataframes that will store climate summaries for each GCM.rcp as loop through data
 ```{r Create empty dataframes}
 
-variables <- c("Tmean_F","Precip_in","DJF_TmeanF", "MAM_TmeanF", "JJA_TmeanF", "SON_TmeanF", "DJF_Precip_in", "MAM_Precip_in", "JJA_Precip_in","SON_Precip_in", "Annual_max_SWE", "MAM_SON_SWE", "water_balance")
+variables <- c("Tmean_F","Precip_in")
 
 Baseline_Means <- as.data.frame(matrix(data=NA,nrow=length(GCMs)*length(RCPs),ncol=length(variables)+2))
 names(Baseline_Means) <- c("GCM", "RCP", variables)
@@ -67,6 +67,8 @@ Deltas <- as.data.frame(matrix(data=NA,nrow=length(GCMs)*length(RCPs),ncol=lengt
 names(Deltas) <- c("GCM", "RCP", variables)
 
 
+
+
 ```
 
 Loop through met GCM.rcp and summarize each variable
@@ -76,17 +78,9 @@ memory.limit(size = 60000)
 
 source(here::here("Code", "Metric-development", "met-T1-variables.R"),echo = FALSE) 
 
-```
-
-Loop through vic GCM.rcp and summarize each variable
-
-```{r Create vic variables}
-
-source(here::here("Code", "Metric-development", "vic-T1-variables.R"),echo = FALSE) 
-
-write.csv(Baseline_Means,paste0(plot.dir,"/Baseline_Means-T1.csv"),row.names = FALSE)
-write.csv(Future_Means,paste0(plot.dir,"/Future_Means-T1.csv"),row.names = FALSE)
-write.csv(Deltas,paste0(plot.dir,"/Deltas-T1.csv"),row.names = FALSE)
+write.csv(Baseline_Means,paste0(DataOut,"/Baseline_Means.csv"),row.names=FALSE)
+write.csv(Future_Means,paste0(DataOut,"/Future_Means.csv"),row.names=FALSE)
+write.csv(Deltas,paste0(DataOut,"/Deltas.csv"),row.names=FALSE)
 
 ```
 
@@ -110,21 +104,19 @@ scatterplot <- function(df, X, Y, title,xaxis,yaxis){
         legend.text=element_text(size=18), legend.title=element_text(size=16)) + 
   ###
   labs(title =title, 
-       x = paste0("Changes in ",xaxis), # Change
-       y = paste0("Changes in ",yaxis)) + #change
+       x = xaxis, # Change
+       y = yaxis) + #change
   scale_color_manual(name="Scenarios", values=c("black")) +
   # scale_fill_manual(name="Scenarios",values = c("black")) + 
   theme(legend.position="none") 
   plot
 }
-scatterplot(df=Deltas,X=Tmean_F,Y=Precip_in,title="Tmean vs Precip scatterplot",xaxis="Avg Annual Temp (F)",yaxis="Avg Annual Precip (in)")
-ggsave("Scatter_Tmean-pcp.png", path = plot.dir, width = PlotWidth, height = PlotHeight)
+scatterplot(df=Deltas,X=Tmean_F,Y=Precip_in,title=paste0("Changes in climate means in 2050 by GCM run at ", SiteID),
+            xaxis="Changes in annual average temperature (\u00B0F)",
+            yaxis="Changes in annual average precipitation (in)")
 
-scatterplot(df=Deltas,X=DJF_TmeanF,Y=Annual_max_SWE,title="Winter temp vs max SWE scatterplot",xaxis="Avg DJF Temp (F)",yaxis="Avg MAX SWE (in)")
-ggsave("Scatter_DJFTmean-MaxSWE.png", path = plot.dir, width = PlotWidth, height = PlotHeight)
+ggsave("Scatter_Tmean-pcp.png", path = FigDir, width = PlotWidth, height = PlotHeight)
 
-scatterplot(df=Deltas,X=JJA_TmeanF,Y=water_balance,title="Summer Tmean vs water balance scatterplot",xaxis="Avg JJA Tmean (F)",yaxis="Avg Annual Water Balance (in)")
-ggsave("Scatter_JJATmean-WB.png", path = plot.dir, width = PlotWidth, height = PlotHeight)
 
 # PCA df setup
 head(Deltas)
@@ -139,20 +131,27 @@ summary(PCA)
 
 str(PCA)
 
-
 ggbiplot(PCA, labels=rownames(Deltas.rownames))
-ggsave("PCA-plot.png", path = plot.dir, width = PlotWidth, height = PlotHeight)
 
-pca.x<-as.data.frame(PCA$x)
-
-# This method doesn't return the exact models we selected,
-# but we may not have selected the most divergent models
-CF1 <- rownames(pca.x)[which.min(pca.x$PC1)]
-CF2 <- rownames(pca.x)[which.max(pca.x$PC1)]
-CF3 <- rownames(pca.x)[which.min(pca.x$PC2)]
-CF4 <- rownames(pca.x)[which.max(pca.x$PC2)]
+ggsave("PCA-plot.png", path = FigDir, width = PlotWidth, height = PlotHeight)
 
 # Select PCs
+pca.df<-as.data.frame(PCA$x) 
+
+PC1 <- factor(c(rownames(pca.df)[which.min(pca.df$PC1)],rownames(pca.df)[which.max(pca.df$PC1)])) 
+PC2<- c(rownames(pca.df)[which.min(pca.df$PC2)],rownames(pca.df)[which.max(pca.df$PC2)]) 
+
+CFs <- c("inmcm4.rcp85","HadGEM2-ES.rcp45","CanESM2.rcp85") #*UPDATE*
+# colors2 <-  c("#6EB2D4", "#CA0020")
+colors2 <- c("#12045C","#ffcccc","#E10720") #*UPDATE*
+
+#Updated Scatter
+scatterplot(df=Deltas,X=Tmean_F,Y=Precip_in,title="Tmean vs Precip scatterplot",xaxis="Avg Annual Temp (F)",yaxis="Avg Annual Precip (in)") + geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[1])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[1])])), shape=21, size=10, stroke=3, colour=colors2[1]) +
+  geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[2])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[2])])), shape=21, size=10, stroke=3, colour=colors2[2]) +
+  geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[3])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[3])])), shape=21, size=10, stroke=3, colour=colors2[3]) 
+
+ggsave("Selected-CFs-scatterplot.png", width = PlotWidth, height = PlotHeight, path = FigDir)
+
 
 
 ```
