@@ -12,7 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Initials
 
-_When running - update SiteID then go to end and select CFs after completed_
+To run:
+1. Update SiteID
+2. Run through data extraction (takes 30-45 mins)
+3. At end and select CFs after completed
 
 ```{r Initials, echo=FALSE, message=FALSE, warning=FALSE}
 
