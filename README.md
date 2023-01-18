@@ -8,7 +8,7 @@ Developed by: [Amber Runyon, Ph.D](amber_runyon@nps.gov) - *NPS Climate Change R
 This project has four steps, each contained in a RMarkdown document:
 
 **1. Select climate futures from top-tier climate metrics**
-[*Script: Spatial_T1_extraction.Rmd*](https://github.com/nationalparkservice/WRST-climate-futures/blob/main/Spatial_T1_extraction.Rmd)
+[*Script: CF-selection.Rmd*](https://github.com/nationalparkservice/WRST-climate-futures/blob/main/Spatial_T1_extraction.Rmd)
 
 This script...
 
