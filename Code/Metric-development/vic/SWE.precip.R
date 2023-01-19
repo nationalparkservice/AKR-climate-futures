@@ -48,8 +48,8 @@ DF = data.frame()
   s <- aggregate(var_swe, by = by_t, FUN = function(x) max(x)) #Don't need to divide by #yrs b/c by year
   s1 <- split(s, "time")
   
-  ratio1 <- s1[1:37,,]/p1[1:37,,]
-  ratio  <- s[,1:37,,]/p[,1:37,,]
+  ratio1 <- s1[1:length(daymet.period),,]/p1[1:length(daymet.period),,]
+  ratio  <- s[,1:length(daymet.period),,]/p[,1:length(daymet.period),,]
 
   
   df<-data.frame(year=daymet.period,mean=NA)
@@ -117,8 +117,8 @@ for (G in 1:length(GCMs)){
   s <- aggregate(var_swe, by = by_t, FUN = function(x) max(x)) #Don't need to divide by #yrs b/c by year
   s1 <- split(s, "time")
   
-  ratio1 <- s1[1:31,,]/p1[1:31,,]
-  ratio  <- s[,1:31,,]/p[,1:31,,]
+  ratio1 <- s1[1:length(future.period),,]/p1[1:length(future.period),,]
+  ratio  <- s[,1:length(future.period),,]/p[,1:length(future.period),,]
   mean_fut<-st_apply(ratio, c("x", "y"), mean)
   
   df<-data.frame(year=future.period,mean=NA)

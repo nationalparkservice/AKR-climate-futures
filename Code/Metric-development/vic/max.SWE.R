@@ -82,7 +82,7 @@ for (G in 1:length(GCMs)){
 
   by_t = "1 year"
   hist <- aggregate(hist_var_stars, by = by_t, FUN = function(x) max(x)) #Don't need to divide by #yrs b/c by year
-  hist <- hist[,2:51,,]
+  hist <- hist[,1:length(historical.period),,]
   # hist1 <- split(hist, "time")
   # 
   # 
@@ -96,7 +96,7 @@ for (G in 1:length(GCMs)){
 
   
   fut <- aggregate(fut_var_stars, by = by_t, FUN = function(x) max(x)) # Doesn't work in lat/long. Must be projected. Removes units from tmax. Also aggregates to a lower resolution.
-  fut <- fut[,2:32,,]
+  fut <- fut[,1:length(future.period),,]
   fut1 <- split(fut, "time")
   
   df<-data.frame(year=future.period,mean=NA)

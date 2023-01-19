@@ -97,7 +97,7 @@ for (G in 1:length(GCMs)){
 
   
   fut <- aggregate(fut_var_stars, by = by_t, FUN = function(x) mean(x)) # Doesn't work in lat/long. Must be projected. Removes units from tmax. Also aggregates to a lower resolution.
-  fut <- fut[,1:31,,]
+  fut <- fut[,1:length(future.period),,]
   fut1 <- split(fut, "time")
   
   df<-data.frame(year=future.period,mean=NA)
@@ -109,7 +109,7 @@ for (G in 1:length(GCMs)){
   DF<-rbind(DF,df)
 
   
-  mean_hist <- st_apply(hist, c("x", "y"), mean) # find mean
+  # mean_hist <- st_apply(hist, c("x", "y"), mean) # find mean
   mean_fut <- st_apply(fut, c("x", "y"), mean)
   delta <- mean_fut - mean_grid
   saveRDS(delta, file = paste(data.dir,paste(var,gcm,rcp,sep="_"),sep="/"))
