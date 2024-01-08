@@ -1,4 +1,4 @@
-# WRST climate futures creation
+# Alaska Climate Futures creation using NCAR BCSD 10km data
 Developed by: [Amber Runyon, Ph.D](amber_runyon@nps.gov) - *NPS Climate Change Response Program*
 
 *Contents of this repository were developed for generating spatial climate futures for Wrangell-St. Elias NPP. If you wish to use this code, please contact developers.*
