@@ -3,13 +3,13 @@ long.title = "average annual temperature (\u00B0F)"
 scale="inferno"
 ratio = 1 #aspect ratio for ts
 
-shp = wrst # area is wrst
+# shp = wrst # area is wrst
 
 # create CF file lists
 rds.ls = list.files(path = dir, pattern = paste0(var,"_"), full.names = TRUE)
 CF1.ls = Filter(function(x) grepl(paste(GCMs[1], collapse = "|"), x), rds.ls)
 CF2.ls = Filter(function(x) grepl(paste(GCMs[2], collapse = "|"), x), rds.ls)
-CF3.ls = Filter(function(x) grepl(paste(GCMs[3], collapse = "|"), x), rds.ls)
+# CF3.ls = Filter(function(x) grepl(paste(GCMs[3], collapse = "|"), x), rds.ls)
 
 # Generate sample data for ts plot
 df = read.csv(Filter(function(x) grepl(paste(".csv", collapse = "|"), x), rds.ls))
@@ -25,15 +25,15 @@ means <- df %>% group_by(CF) %>%
 # read in RDS for setting scale limits
 cf1 <- readRDS(CF1.ls)
 cf2 <- readRDS(CF2.ls)
-cf3 <- readRDS(CF3.ls)
+# cf3 <- readRDS(CF3.ls)
 
-scale.min = min(c(cf1$mean,cf2$mean,cf3$mean),na.rm=TRUE)
-scale.max = max(c(cf1$mean,cf2$mean,cf3$mean),na.rm=TRUE)
+scale.min = min(c(cf1$mean,cf2$mean),na.rm=TRUE)
+scale.max = max(c(cf1$mean,cf2$mean),na.rm=TRUE)
 
 # ggplot
 map.plot <- function(data, title,xaxis,metric,col){
   ggplot() +
-    geom_raster(data = ak_df ,aes(x = x, y = y,alpha=HYP_HR_SR_W.1), show.legend=FALSE) +
+    geom_raster(data = ak_df ,aes(x = x, y = y,alpha=HYP_HR_SR_W_1), show.legend=FALSE) +
     geom_stars(data = data, alpha = 0.8) + 
     geom_sf(data = shp, aes(), fill = NA) + 
     scale_fill_viridis(direction=1, option = scale,
@@ -52,7 +52,7 @@ map.plot <- function(data, title,xaxis,metric,col){
 
 cf1.plot <- map.plot(data=readRDS(CF1.ls),title=CFs[1],metric=long.title,col=cols[1])
 cf2.plot <- map.plot(data=readRDS(CF2.ls),title=CFs[2],metric=long.title,col=cols[2])
-cf3.plot <- map.plot(data=readRDS(CF3.ls),title=CFs[3],metric=long.title,col=cols[3])
+# cf3.plot <- map.plot(data=readRDS(CF3.ls),title=CFs[3],metric=long.title,col=cols[3])
 
 ts <- ggplot(df, aes(x=Year, y=(eval(parse(text=var))), group=CF, colour = CF)) +
  
@@ -76,7 +76,7 @@ ts
 
 
 #### Just maps and ts plot
-maps <- grid_arrange_shared_legend(cf1.plot, cf2.plot, cf3.plot, ncol = 3, nrow = 1, position = "bottom", 
+maps <- grid_arrange_shared_legend(cf1.plot, cf2.plot,  ncol = 2, nrow = 1, position = "bottom", 
                                    top = textGrob(paste0("Change in ",long.title),
                                                   gp=gpar(fontface="bold", col="black", fontsize=16)))
 # g <- ggarrange(maps,ts, nrow=2)
@@ -84,12 +84,12 @@ maps <- grid_arrange_shared_legend(cf1.plot, cf2.plot, cf3.plot, ncol = 3, nrow 
 
 #### Maps, ts, table
 delta.var <- means
-delta.var$var[1:3] <- delta.var$var[1:3] - delta.var$var[4]
+delta.var$var[1:2] <- delta.var$var[1:2] - delta.var$var[3]
 delta.var$var <- signif(delta.var$var, digits = 1)
 
 table <- tableGrob(delta.var, rows = NULL,cols=NULL)
-table <- gtable_add_grob(table, grobs = rectGrob(gp = gpar(fill=NA, lwd=2)), #library(gtable)
-                     t=4,b=nrow(table),l=1,r=ncol(table))
+# table <- gtable_add_grob(table, grobs = rectGrob(gp = gpar(fill=NA, lwd=2)), #library(gtable)
+#                      t=4,b=nrow(table),l=1,r=ncol(table))
 table <- annotate_figure(table,
                 top = text_grob("Historical = absolute value \n CFs = change values", color = "black",
                                  face = "italic", size = 12))
@@ -100,7 +100,7 @@ g <- ggarrange(maps,tsplots, nrow=2)
 g
 
 
-ggsave(paste0(var,"_ANN.png"), width = 15, height = 9, path = plot.dir)
+ggsave(paste0(var,"_ANN.png"), width = 15, height = 9, path = plot.dir,bg="white")
 
 
 

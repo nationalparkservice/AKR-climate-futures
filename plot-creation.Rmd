@@ -14,26 +14,29 @@ rm(list = ls())
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(units); library(tidyr); library(lemon);library(ggpubr);library(gridExtra);library(grid); library(gtable); library(lubridate);library(raster)
 
-base.dir = "C:/Users/achildress/Documents/wrst_temp"
-data.dir = paste0(base.dir,"/Data")
-plot.dir = "./Data/figures"
+SiteID <- "LACL"
 
-boundary.dir <- "C:/Users/achildress/DOI/NPS-WRST-Resource Stewardship Strategy - Climate/3.0 Climate futures development (Summer 2021)/Data/Boundary_shapefiles/"
-wrst <- st_read(paste0(boundary.dir, "wrst_simple.shp")) # Wrangell Mountains
-wrst <- st_transform(wrst, 3338)
+base.dir = "C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/LACL/" 
+data.dir = paste0(base.dir,"/Data")
+plot.dir = paste0(base.dir,"/Figures")
+# plot.dir = "./Data/figures"
+
+nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
+park <- filter(nps_boundary, UNIT_CODE == SiteID)
+shp <- st_transform(park, 3338)
 
 # insert topo
-topo <- stack(paste0(boundary.dir, 'HYP_HR_SR_W/HYP_HR_SR_W.tif')) # read in as stack so can see RBG layers
-ext <- extent(-147, -139, 59.3, 63) # extent defined by lat/long
+topo <- stack('./Data/nps_boundary/HYP_HR_SR_W/HYP_HR_SR_W.tif') # read in as stack so can see RBG layers
+ext <- extent(park) # extent defined by lat/long
 ak <- crop(topo, ext)
 # plotRGB(ak)
 ak2 <- projectRaster(ak, crs = CRS('+init=EPSG:3338')) # Alaska Albers 
 ak_df  <- as.data.frame(ak2, xy = TRUE) # this step is important to get it to plot in ggplot
 
 
-GCMs <- c("inmcm4.rcp85","ACCESS1-3.rcp45","CanESM2.rcp85")
-CFs <- c("Climate Future 1", "Climate Future 2", "Climate Future 3")
-cols <- c("#12045C","#ffcccc","#E10720")
+GCMs <- c("MRI-CGCM3.rcp85","CanESM2.rcp85")
+CFs <- c("Climate Future 1", "Climate Future 2")
+cols <- c("#6EB2D4","#CA0020")
 
 CF_GCM <- data.frame(CF=CFs,GCM=GCMs,CF_col=cols)
 ```
@@ -44,7 +47,7 @@ CF_GCM <- data.frame(CF=CFs,GCM=GCMs,CF_col=cols)
 ```
 
 ```{r scatterplot, echo=FALSE, message=FALSE, warning=FALSE,eval=FALSE}
-dir = paste0(data.dir,"/WRST_simple/")
+dir = paste0(data.dir)
 df = read.csv(paste0(dir,"/Monthly_met.csv"))
 
 tmax = cbind(df[,1:3],df[grep("tmax",  colnames(df))]);names(tmax)[4:7] = gsub("\\..*","",names(tmax[,4:7]))
@@ -89,7 +92,7 @@ source(here::here("Code", "Plots", "map_monthly_dotplots_pcp.R"),echo = FALSE)
 ```
 
 ```{r annual map-timeseries plots, include=FALSE,results=hide, eval=TRUE}
-dir = paste0(data.dir,"/WRST_simple/")
+dir = paste0(data.dir)
 source(here::here("Code", "Plots", "maps_ts_plots_tmean.R"),echo = FALSE)
 source(here::here("Code", "Plots", "maps_ts_plots_pcp.R"),echo = FALSE)
 source(here::here("Code", "Plots", "maps_ts_plots_water.balance.R"),echo = FALSE)

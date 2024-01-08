@@ -3,13 +3,13 @@ long.title = "minimum temperature (\u00B0F)"
 delta.var = "tmin"
 scale="inferno"
 
-shp = wrst # area is wrst
+# shp = wrst # area is wrst
 
 # create CF file lists
 rds.ls = list.files(path = dir, pattern = paste0(var,"_"), full.names = TRUE)
 CF1.ls = Filter(function(x) grepl(paste(GCMs[1], collapse = "|"), x), rds.ls)
 CF2.ls = Filter(function(x) grepl(paste(GCMs[2], collapse = "|"), x), rds.ls)
-CF3.ls = Filter(function(x) grepl(paste(GCMs[3], collapse = "|"), x), rds.ls)
+# CF3.ls = Filter(function(x) grepl(paste(GCMs[3], collapse = "|"), x), rds.ls)
 
 # read in RDS for setting scale limits
 # CF1
@@ -23,22 +23,22 @@ MAM.cf2 <- readRDS(Filter(function(x) grepl(paste("MAM", collapse = "|"), x), CF
 JJA.cf2 <- readRDS(Filter(function(x) grepl(paste("JJA", collapse = "|"), x), CF2.ls))
 SON.cf2 <- readRDS(Filter(function(x) grepl(paste("SON", collapse = "|"), x), CF2.ls))
 # CF3
-DJF.cf3 <- readRDS(Filter(function(x) grepl(paste("DJF", collapse = "|"), x), CF3.ls))
-MAM.cf3 <- readRDS(Filter(function(x) grepl(paste("MAM", collapse = "|"), x), CF3.ls))
-JJA.cf3 <- readRDS(Filter(function(x) grepl(paste("JJA", collapse = "|"), x), CF3.ls))
-SON.cf3 <- readRDS(Filter(function(x) grepl(paste("SON", collapse = "|"), x), CF3.ls))
+# DJF.cf3 <- readRDS(Filter(function(x) grepl(paste("DJF", collapse = "|"), x), CF3.ls))
+# MAM.cf3 <- readRDS(Filter(function(x) grepl(paste("MAM", collapse = "|"), x), CF3.ls))
+# JJA.cf3 <- readRDS(Filter(function(x) grepl(paste("JJA", collapse = "|"), x), CF3.ls))
+# SON.cf3 <- readRDS(Filter(function(x) grepl(paste("SON", collapse = "|"), x), CF3.ls))
 
 scale.min = min(c(DJF.cf1$mean,MAM.cf1$mean,JJA.cf1$mean,SON.cf1$mean,
-                  DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean,
-                  DJF.cf3$mean,MAM.cf3$mean,JJA.cf3$mean,SON.cf2$mean),na.rm=TRUE)
+                  DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean),na.rm=TRUE)
+                  # DJF.cf3$mean,MAM.cf3$mean,JJA.cf3$mean,SON.cf2$mean),na.rm=TRUE)
 scale.max = max(c(DJF.cf1$mean,MAM.cf1$mean,JJA.cf1$mean,SON.cf1$mean,
-                  DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean,
-                  DJF.cf3$mean,MAM.cf3$mean,JJA.cf3$mean,SON.cf2$mean),na.rm=TRUE)
+                  DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean),na.rm=TRUE)
+                  # DJF.cf3$mean,MAM.cf3$mean,JJA.cf3$mean,SON.cf2$mean),na.rm=TRUE)
 
 # ggplot
 map.plot <- function(data, title,xaxis,metric,col){
   ggplot() + 
-    geom_raster(data = ak_df ,aes(x = x, y = y,alpha=HYP_HR_SR_W.1), show.legend=FALSE) +
+    geom_raster(data = ak_df ,aes(x = x, y = y,alpha=HYP_HR_SR_W_1), show.legend=FALSE) +
     geom_stars(data = data, alpha = 0.8) + 
     geom_sf(data = shp, aes(), fill = NA) + 
     scale_fill_viridis(direction=1, option = scale, 
@@ -69,20 +69,20 @@ JJA.cf2.plot <- map.plot(data=JJA.cf2, title="",metric=paste0("Average ",long.ti
 SON.cf2.plot <- map.plot(data=SON.cf2, title="",metric=paste0("Average ",long.title),col=CF_GCM$CF_col[2])
 
 # CF3
-DJF.cf3.plot <- map.plot(data=JJA.cf3, title=CFs[3],metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
-MAM.cf3.plot <- map.plot(data=MAM.cf3, title="",metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
-JJA.cf3.plot <- map.plot(data=JJA.cf3, title="",metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
-SON.cf3.plot <- map.plot(data=SON.cf3, title="",metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
+# DJF.cf3.plot <- map.plot(data=JJA.cf3, title=CFs[3],metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
+# MAM.cf3.plot <- map.plot(data=MAM.cf3, title="",metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
+# JJA.cf3.plot <- map.plot(data=JJA.cf3, title="",metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
+# SON.cf3.plot <- map.plot(data=SON.cf3, title="",metric=paste0("Average ",long.title),col=CF_GCM$CF_col[3])
 
 ###########################################################
 ##### NONE OF THESE WORK ##################################
 # Merge into one plot
 
-maps.all <- grid_arrange_shared_legend(DJF.cf1.plot,DJF.cf2.plot,DJF.cf3.plot, # THIS WORKS, BUT WANT TO HAVE SHARED RC TITLES
-                                       MAM.cf1.plot,MAM.cf2.plot,MAM.cf3.plot,    # FOR CF AND SEASON
-                                       JJA.cf1.plot,JJA.cf2.plot,JJA.cf3.plot,
-                                       SON.cf1.plot,SON.cf2.plot,SON.cf3.plot,
-                                       nrow = 4,ncol=3, position = "bottom") 
+maps.all <- grid_arrange_shared_legend(DJF.cf1.plot,DJF.cf2.plot, # THIS WORKS, BUT WANT TO HAVE SHARED RC TITLES
+                                       MAM.cf1.plot,MAM.cf2.plot,    # FOR CF AND SEASON
+                                       JJA.cf1.plot,JJA.cf2.plot,
+                                       SON.cf1.plot,SON.cf2.plot,
+                                       nrow = 4,ncol=2, position = "bottom") 
 
 djf <- textGrob("DJF", gp = gpar(fontface="bold", size = 12))
 mam <- textGrob("MAM", gp = gpar(fontface="bold", size = 12))
@@ -120,4 +120,4 @@ g <- grid.arrange(maps, dotplot,ncol = 2, widths = c(6, 4), clip = FALSE)
 annotate_figure(g, top = text_grob(paste0("Change in seasonal ",long.title, "; 1950-1999 vs 2025-2055"), 
                                       face = "bold", size = 20))
 
-ggsave(paste0("seasonal_",var,".png"), width = 15, height = 9, path = plot.dir)
+ggsave(paste0("seasonal_",var,".png"), width = 15, height = 9, path = plot.dir,bg="white")

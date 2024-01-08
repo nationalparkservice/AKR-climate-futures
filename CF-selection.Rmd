@@ -23,11 +23,11 @@ rm(list = ls())
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(ggbiplot)
 
-SiteID <- "KEFJ" #*UPDATE*
+SiteID <- "LACL" #*UPDATE*
 
-data.dir <- "D:/NCAR_AK/met/monthly/BCSD/" 
-vic.dir <- "D:/NCAR_AK/vic_hydro/monthly/BCSD"
-plot.dir <- paste0("C:/Users/achildress/Documents/wrst_temp/",SiteID) #*UPDATE*
+data.dir <- "E:/NCAR_AK/met/monthly/BCSD/" 
+vic.dir <- "E:/NCAR_AK/vic_hydro/monthly/BCSD"
+plot.dir <- "C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/LACL/" #*UPDATE*
 
 dir.create(plot.dir,showWarnings=FALSE)
 
@@ -92,6 +92,7 @@ Run PCA and create scatterplots for T1 variables
 ```{r Run PCA}
 # Run scatterplot
 ## REDO PLOT AND MULTIPLY PCP BY 30 
+Deltas <- read.csv(paste0(DataOut,"/Deltas.csv"))
 
 PlotWidth = 15
 PlotHeight = 9
@@ -144,9 +145,9 @@ pca.df<-as.data.frame(PCA$x)
 PC1 <- factor(c(rownames(pca.df)[which.min(pca.df$PC1)],rownames(pca.df)[which.max(pca.df$PC1)])) 
 PC2<- c(rownames(pca.df)[which.min(pca.df$PC2)],rownames(pca.df)[which.max(pca.df$PC2)]) 
 
-CFs <- c("inmcm4.rcp85","HadGEM2-ES.rcp45","CanESM2.rcp85") #*UPDATE*
+CFs <- c("MRI-CGCM3.rcp85","CanESM2.rcp85") #*UPDATE*
 # colors2 <-  c("#6EB2D4", "#CA0020")
-colors2 <- c("#12045C","#ffcccc","#E10720") #*UPDATE*
+colors2 <- c("#6EB2D4","#CA0020") #*UPDATE*
 
 #Updated Scatter
 scatterplot(df=Deltas,X=Tmean_F,Y=Precip_in,title="Tmean vs Precip scatterplot",xaxis="Avg Annual Temp (F)",yaxis="Avg Annual Precip (in)") + geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[1])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[1])])), shape=21, size=10, stroke=3, colour=colors2[1]) +
