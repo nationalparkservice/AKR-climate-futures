@@ -9,7 +9,7 @@ scale="inferno"
 rds.ls = list.files(path = dir, pattern = paste0(var,"_"), full.names = TRUE)
 CF1.ls = Filter(function(x) grepl(paste(GCMs[1], collapse = "|"), x), rds.ls)
 CF2.ls = Filter(function(x) grepl(paste(GCMs[2], collapse = "|"), x), rds.ls)
-CF3.ls = Filter(function(x) grepl(paste(GCMs[3], collapse = "|"), x), rds.ls)
+# CF3.ls = Filter(function(x) grepl(paste(GCMs[3], collapse = "|"), x), rds.ls)
 
 # read in RDS for setting scale limits
 # CF1
