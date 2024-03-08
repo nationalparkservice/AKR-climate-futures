@@ -23,11 +23,11 @@ rm(list = ls())
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(ggbiplot)
 
-SiteID <- "LACL" #*UPDATE*
+SiteID <- "Kachemak-Tuxedni" #*UPDATE*
 
 data.dir <- "E:/NCAR_AK/met/monthly/BCSD/" 
 vic.dir <- "E:/NCAR_AK/vic_hydro/monthly/BCSD"
-plot.dir <- "C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/LACL/" #*UPDATE*
+plot.dir <- paste0("C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/",SiteID) #*UPDATE*
 
 dir.create(plot.dir,showWarnings=FALSE)
 
@@ -50,9 +50,13 @@ GCM.RCP <- sort(apply(expand.grid(GCMs, RCPs), 1, paste, collapse="."))
 ```{r Load spatial data}
 
 # Spatial
-nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
-park <- filter(nps_boundary, UNIT_CODE == SiteID)
-shp <- st_transform(park, 3338)
+# nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
+# park <- filter(nps_boundary, UNIT_CODE == SiteID)
+# shp <- st_transform(park, 3338)
+
+#Unique
+huc <- st_read("C:/Users/arunyon/OneDrive - DOI/Documents/GIS/AK_HUC8/Kachemak_Tuxedni.shp")
+shp <- st_transform(huc, 3338)
 
 ```
 Create empty dataframes that will store climate summaries for each GCM.rcp as loop through data
@@ -79,7 +83,7 @@ Loop through met GCM.rcp and summarize each variable
 ```{r Create met variables, results=hide, eval=TRUE}
 memory.limit(size = 60000)
 
-source(here::here("Code", "Metric-development", "met-T1-variables.R"),echo = FALSE) 
+source(here::here("Code", "Metric-development", "met-T1-variables-T&P.R"),echo = FALSE) 
 
 write.csv(Baseline_Means,paste0(DataOut,"/Baseline_Means.csv"),row.names=FALSE)
 write.csv(Future_Means,paste0(DataOut,"/Future_Means.csv"),row.names=FALSE)
@@ -145,7 +149,7 @@ pca.df<-as.data.frame(PCA$x)
 PC1 <- factor(c(rownames(pca.df)[which.min(pca.df$PC1)],rownames(pca.df)[which.max(pca.df$PC1)])) 
 PC2<- c(rownames(pca.df)[which.min(pca.df$PC2)],rownames(pca.df)[which.max(pca.df$PC2)]) 
 
-CFs <- c("MRI-CGCM3.rcp85","CanESM2.rcp85") #*UPDATE*
+CFs <- c("MRI-CGCM3.rcp45","CanESM2.rcp85") #*UPDATE*
 # colors2 <-  c("#6EB2D4", "#CA0020")
 colors2 <- c("#6EB2D4","#CA0020") #*UPDATE*
 
