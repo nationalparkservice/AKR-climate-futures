@@ -19,22 +19,23 @@ knitr::opts_chunk$set(echo = TRUE)
 
 rm(list = ls())
 
-SiteID <- "Kachemak-Tuxedni" #*UPDATE*
+SiteID <- "CAKR" #*UPDATE*
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(units)
 
 met.dir <- "E:/NCAR_AK/met" 
 vic.dir <- "E:/NCAR_AK/vic_hydro"
 
-working.dir <- "C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/Kachemak-Tuxedni/" #*UPDATE*
+# working.dir <- paste0("C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/",SiteID) #*UPDATE*
+working.dir <- paste0("C:/Users/arunyon/OneDrive - DOI/AKR-CFs/",SiteID) #*UPDATE*
 
 data.dir <- paste(working.dir, "Data", sep="/")
 
 historical.period <- as.character(seq(1950,1999,1))
-future.period <- as.character(seq(2025,2099,1))
+future.period <- as.character(seq(2035,2065,1))
 daymet.period <- as.character(seq(1980,2016,1))
 
-GCMs <- c("MRI-CGCM3.rcp45","CanESM2.rcp85")
+GCMs <- c("MRI-CGCM3.rcp45","CCSM4.rcp85")
 CFs <- c("Climate Future 1", "Climate Future 2")
 cols <- c("#6EB2D4","#CA0020")
 
@@ -48,12 +49,12 @@ CF_GCM <- data.frame(CF=CFs,GCM=GCMs,CF_col=cols)
 ```{r Load spatial data}
 
 # Spatial
-# nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
-# park <- filter(nps_boundary, UNIT_CODE == SiteID)
-# shp <- st_transform(park, 3338)
+nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
+park <- filter(nps_boundary, UNIT_CODE == SiteID)
+shp <- st_transform(park, 3338)
 
-huc <- st_read("C:/Users/arunyon/OneDrive - DOI/Documents/GIS/AK_HUC8/Kachemak_Tuxedni.shp")
-shp <- st_transform(huc, 3338)
+# huc <- st_read("C:/Users/arunyon/OneDrive - DOI/Documents/GIS/AK_HUC8/Kachemak_Tuxedni.shp")
+# shp <- st_transform(huc, 3338)
 
 ```
 

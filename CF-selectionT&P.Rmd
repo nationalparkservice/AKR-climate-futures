@@ -23,11 +23,12 @@ rm(list = ls())
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(ggbiplot)
 
-SiteID <- "Kachemak-Tuxedni" #*UPDATE*
+SiteID <- "CAKR" #*UPDATE*
 
 data.dir <- "E:/NCAR_AK/met/monthly/BCSD/" 
 vic.dir <- "E:/NCAR_AK/vic_hydro/monthly/BCSD"
-plot.dir <- paste0("C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/",SiteID) #*UPDATE*
+# plot.dir <- paste0("C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/",SiteID) #*UPDATE*
+plot.dir <- paste0("C:/Users/arunyon/OneDrive - DOI/AKR-CFs/",SiteID) #*UPDATE*
 
 dir.create(plot.dir,showWarnings=FALSE)
 
@@ -50,13 +51,13 @@ GCM.RCP <- sort(apply(expand.grid(GCMs, RCPs), 1, paste, collapse="."))
 ```{r Load spatial data}
 
 # Spatial
-# nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
-# park <- filter(nps_boundary, UNIT_CODE == SiteID)
-# shp <- st_transform(park, 3338)
+nps_boundary <- st_read('./Data/nps_boundary/nps_boundary.shp')
+park <- filter(nps_boundary, UNIT_CODE == SiteID)
+shp <- st_transform(park, 3338)
 
-#Unique
-huc <- st_read("C:/Users/arunyon/OneDrive - DOI/Documents/GIS/AK_HUC8/Kachemak_Tuxedni.shp")
-shp <- st_transform(huc, 3338)
+# #Unique
+# huc <- st_read("C:/Users/arunyon/OneDrive - DOI/Documents/GIS/AK_HUC8/Kachemak_Tuxedni.shp")
+# shp <- st_transform(huc, 3338)
 
 ```
 Create empty dataframes that will store climate summaries for each GCM.rcp as loop through data
@@ -104,12 +105,16 @@ PlotHeight = 9
 scatterplot <- function(df, X, Y, title,xaxis,yaxis){
   plot <- ggplot(data=df, aes(x={{ X }}, y={{ Y }}))  +
   geom_text_repel(aes(label=paste(GCM,RCP,sep="."))) +
-  geom_point(colour="black",size=4) +
+  geom_point(colour="black",size=4) + 
   theme(axis.text=element_text(size=18),
         axis.title.x=element_text(size=18,vjust=-0.2),
         axis.title.y=element_text(size=18,vjust=0.2),
         plot.title=element_text(size=18,face="bold",vjust=2,hjust=0.5),
-        legend.text=element_text(size=18), legend.title=element_text(size=16)) + 
+        legend.text=element_text(size=18), legend.title=element_text(size=16),
+        panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank()) + 
   ###
   labs(title =title, 
        x = xaxis, # Change
@@ -123,43 +128,73 @@ scatterplot(df=Deltas,X=Tmean_F,Y=Precip_in,title=paste0("Changes in climate mea
             xaxis="Changes in annual average temperature (\u00B0F)",
             yaxis="Changes in annual average precipitation (in)")
 
-ggsave("Scatter_Tmean-pcp.png", path = FigDir, width = PlotWidth, height = PlotHeight)
+ggsave("Scatter_Tmean-pcp.png", path = FigDir, width = PlotWidth, height = PlotHeight,bg="white")
 
 
-# PCA df setup
-head(Deltas)
-Deltas.rownames <- Deltas[,-c(1:2)]
-rownames(Deltas.rownames) <- paste(Deltas$GCM,Deltas$RCP,sep=".")
+# # PCA df setup
+# head(Deltas)
+# Deltas.rownames <- Deltas[,-c(1:2)]
+# rownames(Deltas.rownames) <- paste(Deltas$GCM,Deltas$RCP,sep=".")
+# 
+# PCA <- prcomp(Deltas.rownames[,c(1:length(Deltas.rownames))], center = TRUE,scale. = TRUE)
+# 
+# head(PCA$rotation)
+# head(PCA$x)
+# summary(PCA)
+# 
+# str(PCA)
+# 
+# ggbiplot(PCA, labels=rownames(Deltas.rownames))
+# 
+# ggsave("PCA-plot.png", path = FigDir, width = PlotWidth, height = PlotHeight)
+# 
+# # Select PCs
+# pca.df<-as.data.frame(PCA$x) 
+# 
+# PC1 <- factor(c(rownames(pca.df)[which.min(pca.df$PC1)],rownames(pca.df)[which.max(pca.df$PC1)])) 
+# PC2<- c(rownames(pca.df)[which.min(pca.df$PC2)],rownames(pca.df)[which.max(pca.df$PC2)]) 
 
-PCA <- prcomp(Deltas.rownames[,c(1:length(Deltas.rownames))], center = TRUE,scale. = TRUE)
-
-head(PCA$rotation)
-head(PCA$x)
-summary(PCA)
-
-str(PCA)
-
-ggbiplot(PCA, labels=rownames(Deltas.rownames))
-
-ggsave("PCA-plot.png", path = FigDir, width = PlotWidth, height = PlotHeight)
-
-# Select PCs
-pca.df<-as.data.frame(PCA$x) 
-
-PC1 <- factor(c(rownames(pca.df)[which.min(pca.df$PC1)],rownames(pca.df)[which.max(pca.df$PC1)])) 
-PC2<- c(rownames(pca.df)[which.min(pca.df$PC2)],rownames(pca.df)[which.max(pca.df$PC2)]) 
-
-CFs <- c("MRI-CGCM3.rcp45","CanESM2.rcp85") #*UPDATE*
+CFs <- c("MRI-CGCM3.rcp45","CCSM4.rcp85") #*UPDATE*
 # colors2 <-  c("#6EB2D4", "#CA0020")
 colors2 <- c("#6EB2D4","#CA0020") #*UPDATE*
 
 #Updated Scatter
-scatterplot(df=Deltas,X=Tmean_F,Y=Precip_in,title="Tmean vs Precip scatterplot",xaxis="Avg Annual Temp (F)",yaxis="Avg Annual Precip (in)") + geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[1])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[1])])), shape=21, size=10, stroke=3, colour=colors2[1]) +
-  geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[2])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[2])])), shape=21, size=10, stroke=3, colour=colors2[2]) +
-  geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[3])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[3])])), shape=21, size=10, stroke=3, colour=colors2[3]) 
+scatterplot(df=Deltas,X=Tmean_F,Y=Precip_in,title="Tmean vs Precip scatterplot",xaxis="Avg Annual Temp (F)",yaxis="Avg Annual Precip (in)") + geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[1])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[1])])), shape=21, size=12, stroke=3, colour=colors2[1]) +
+  geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[2])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[2])])), shape=22, size=12, stroke=3, colour=colors2[2]) 
 
-ggsave("Selected-CFs-scatterplot.png", width = PlotWidth, height = PlotHeight, path = FigDir)
+  # geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[3])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[3])])), shape=23, size=12, stroke=3, colour=colors2[3]) 
 
+ggsave("Selected-CFs-scatterplot.png", width = PlotWidth, height = PlotHeight, path = FigDir,bg="white")
+
+#dots only
+scatterplot_points <- function(df, X, Y, title,xaxis,yaxis){
+  plot <- ggplot(data=df, aes(x={{ X }}, y={{ Y }}))  +
+  geom_point(colour="black",size=4) + 
+  theme(axis.text=element_text(size=18),
+        axis.title.x=element_text(size=18,vjust=-0.2),
+        axis.title.y=element_text(size=18,vjust=0.2),
+        plot.title=element_text(size=18,face="bold",vjust=2,hjust=0.5),
+        legend.text=element_text(size=18), legend.title=element_text(size=16),
+        panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank()) + 
+  ###
+  labs(title =title, 
+       x = xaxis, # Change
+       y = yaxis) + #change
+  scale_color_manual(name="Scenarios", values=c("black")) +
+  # scale_fill_manual(name="Scenarios",values = c("black")) + 
+  theme(legend.position="none") 
+  plot
+}
+#Updated Scatter
+scatterplot_points(df=Deltas,X=Tmean_F,Y=Precip_in,title="Tmean vs Precip scatterplot",xaxis="Avg Annual Temp (F)",yaxis="Avg Annual Precip (in)") + geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[1])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[1])])), shape=21, size=12, stroke=3, colour=colors2[1]) +
+  geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[2])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[2])])), shape=22, size=12, stroke=3, colour=colors2[2]) 
+
+  # geom_point(aes(x=mean(Tmean_F[which(paste(GCM,RCP,sep=".")==CFs[3])]), y=mean(Precip_in[which(paste(GCM,RCP,sep=".")==CFs[3])])), shape=23, size=12, stroke=3, colour=colors2[3]) 
+
+ggsave("Selected-CFs-scatterplot-pointOnly.png", width = PlotWidth, height = PlotHeight, path = FigDir,bg="white")
 
 
 ```
