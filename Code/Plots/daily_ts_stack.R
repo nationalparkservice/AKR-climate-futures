@@ -63,15 +63,15 @@ for (i in 1:3){
   delta.var[i,2:6] = delta.var[i,2:6] - delta.var[4,2:6]
 }
 delta.var[,2:6] <- signif(delta.var[,2:6], digits = 1)
-
-table <- tableGrob(delta.var, rows = NULL) 
-
-table <- gtable_add_grob(table, grobs = rectGrob(gp = gpar(fill=NA, lwd=2)), #library(gtable)
-                     t=5,b=nrow(table),l=1,r=ncol(table))
-table <- annotate_figure(table,
-                bottom = text_grob("Historical = absolute value; CFs = change values", color = "black",
-                                 face = "italic", size = 12))
-tsplots <- grid.arrange(grid2, table, nrow=2, heights=c(3,1), clip = FALSE)
+# 
+# table <- tableGrob(delta.var, rows = NULL) 
+# 
+# table <- gtable_add_grob(table, grobs = rectGrob(gp = gpar(fill=NA, lwd=2)), #library(gtable)
+#                      t=5,b=nrow(table),l=1,r=ncol(table))
+# table <- annotate_figure(table,
+#                 bottom = text_grob("Historical = absolute value; CFs = change values", color = "black",
+#                                  face = "italic", size = 12))
+# tsplots <- grid.arrange(grid2, table, nrow=2, heights=c(3,1), clip = FALSE)
 
 
 g <- ggarrange(grid1,grid2, ncol=2)
