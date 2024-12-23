@@ -48,10 +48,10 @@ gdd = ts.plot(data=df,var="GDD",title=long.names[6])
 
 #### Just maps and ts plot
 grid1 <- grid_arrange_shared_legend(freeze.thaw,under32,over20, ncol = 1, nrow = 3, position = "bottom", 
-                                   top = textGrob(paste0("Annual threshold exceedances for ",area_name, " (days/year)"),
+                                   top = textGrob(paste0("Annual threshold exceedances for ",SiteID, " (days/year)"),
                                                   gp=gpar(fontface="bold", col="black", fontsize=16)))
 grid2 <- grid_arrange_shared_legend(W.under32,pcp.over.5, ncol = 1, nrow = 2, position = "bottom", 
-                                    top = textGrob(paste0("Annual threshold exceedances for ",area_name, " (days/year)"),
+                                    top = textGrob(paste0("Annual threshold exceedances for ",SiteID, " (days/year)"),
                                                    gp=gpar(fontface="bold", col="black", fontsize=16)))
 # g <- ggarrange(maps,ts, nrow=2)
 # g
@@ -74,10 +74,10 @@ table <- annotate_figure(table,
 tsplots <- grid.arrange(grid2, table, nrow=2, heights=c(3,1), clip = FALSE)
 
 
-g <- ggarrange(grid1,tsplots, ncol=2)
+g <- ggarrange(grid1,grid2, ncol=2)
 g
 
-ggsave(paste0(area,"_ts-stack.png"), width = 15, height = 9, path = plot.dir)
+ggsave(paste0(SiteID,"_ts-stack.png"), width = 15, height = 9, path = plot.dir)
 
 
 
