@@ -81,7 +81,7 @@ grid2 =  annotate_figure(grid2, left = textGrob("SWE (in)", rot = 90, vjust = 1,
                                gp=gpar(fontface="bold", col="black", fontsize=16)))
 
 grid = ggarrange(grid1,grid2,nrow=1,ncol=2) 
-annotate_figure(grid, top = textGrob(area_name,
+annotate_figure(grid, top = textGrob(SiteID,
                                       gp=gpar(fontface="bold", col="black", fontsize=20)))
 
-ggsave(paste0(area,"_SWE-runoff.png"), width = 15, height = 9, path = plot.dir)
+ggsave(paste0(SiteID,"_SWE-runoff.png"), width = 15, height = 9, path = plot.dir)
