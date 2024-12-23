@@ -14,7 +14,7 @@ rm(list = ls())
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(units); library(tidyr); library(lemon);library(ggpubr);library(gridExtra);library(grid); library(gtable); library(lubridate);library(raster)
 
-SiteID <- "NOAT"
+SiteID <- "CAKR"
 
 base.dir = paste0("C:/Users/arunyon/OneDrive - DOI/AKR-CFs/",SiteID) #*UPDATE*
 data.dir = paste0(base.dir,"/Data")
@@ -110,34 +110,18 @@ source(here::here("Code", "Plots", "maps_ts_plots_Pr99v2.R"),echo = FALSE)
 ```
 
 ``` {r timeseries stack, include=FALSE,results=hide, eval=TRUE}
-areas <- c("wrst_simple", 'wrst_mtns', 'copper_plateau', 'coastal_mtns', 'eastern_coast')
-area_names = c("WRST", "WRST mountains", "Copper plateau", "Coastal mountains", "eastern coast")
-
-for (a in 1:length(areas)) {
-  area=areas[a]
-  area_name = area_names[a]
-  dir = paste0(data.dir,"/", area, "/")
-  DF = read.csv(paste0(dir,"/Daily_met.csv"))
+  DF = read.csv(paste0(data.dir,"/Daily_met.csv"))
   source(here::here("Code", "Plots", "daily_ts_stack.R"),echo = FALSE)
-}
 
 ```
 
 ```{r daily plots, include=FALSE,results=hide, eval=TRUE}
-areas <- c('wrst_simple', 'wrst_mtns', 'copper_plateau', 'coastal_mtns', 'eastern_coast')
-area_names = c("WRST", "WRST mountains", "Copper plateau", "Coastal mountains", "eastern coast")
-
-for (a in 1:length(areas)) {
-  area=areas[a]
-  area_name = area_names[a]
-  dir = paste0(data.dir,"/", area, "/")
-  runoff = read.csv(paste0(dir,"/runoff_DAY.csv"))
-  SWE = read.csv(paste0(dir,"/SWE_DAY.csv"))
+  runoff = read.csv(paste0(data.dir,"/runoff_DAY.csv"))
+  SWE = read.csv(paste0(data.dir,"/SWE_DAY.csv"))
   source(here::here("Code", "Plots", "SWE-runoff-plots.R"),echo = FALSE)
-}
 
 ```
 
 ```{r SWE.precip.maps, include=FALSE, results=hide, eval=TRUE}
-source(here::here("Code", "Plots", "SWE.precip.maps.R"),echo = FALSE)
+#source(here::here("Code", "Plots", "SWE.precip.maps.R"),echo = FALSE)
 ```
