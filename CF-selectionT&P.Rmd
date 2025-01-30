@@ -199,3 +199,11 @@ ggsave("Selected-CFs-scatterplot-pointOnly.png", width = PlotWidth, height = Plo
 
 ```
 
+```{r Run NCR comparisons}
+
+# *UPDATE* - Uncomment to run NCR / CCRP comparisons on historical and future T & P averages
+
+# source(here::here("Code", "NCR-comparison", "NCR-CF-comparison.R"),echo = FALSE) 
+
+
+```

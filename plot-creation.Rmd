@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r set directories, include=FALSE, results=hide, eval=TRUE}
 rm(list = ls())
 
-library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(units); library(tidyr); library(lemon);library(ggpubr);library(gridExtra);library(grid); library(gtable); library(lubridate);library(raster)
+library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(units); library(tidyr); library(lemon);library(ggpubr);library(gridExtra);library(grid); library(gtable); library(lubridate);library(terra);library(raster)
 
 SiteID <- "CAKR"
 
@@ -54,6 +54,7 @@ CF_GCM <- data.frame(CF=CFs,GCM=GCMs,CF_col=cols)
 ```{r scatterplot, echo=FALSE, message=FALSE, warning=FALSE,eval=FALSE}
 dir = paste0(data.dir)
 df = read.csv(paste0(dir,"/Monthly_met.csv"))
+df$CF <- factor(df$CF, levels = c("Historical", CFs)) # BCR added 1/30/25 to order future legends as "Historical", "Climate Future 1", and "Climate Future 2" to align better with graphical outputs
 
 tmax = cbind(df[,1:3],df[grep("tmax",  colnames(df))]);names(tmax)[4:7] = gsub("\\..*","",names(tmax[,4:7]))
 tmax.long = gather(tmax, season, var, -c("CF","GCM","Period")); names(tmax.long)[5]="tmax"
@@ -105,7 +106,7 @@ source(here::here("Code", "Plots", "maps_ts_plots_SWE.precip.R"),echo = FALSE)
 source(here::here("Code", "Plots", "maps_ts_plots_max.SWE.R"),echo = FALSE)
 source(here::here("Code", "Plots", "maps_ts_plots_MAMSON.SWE.R"),echo = FALSE)
 source(here::here("Code", "Plots", "maps_ts_plots_soil.temp.R"),echo = FALSE)
-source(here::here("Code", "Plots", "maps_ts_plots_Pr99v2.R"),echo = FALSE)
+# source(here::here("Code", "Plots", "maps_ts_plots_Pr99v2.R"),echo = FALSE) # not running for AK for now - takes very long to run and can get similar info from northern climate reports
 
 ```
 
