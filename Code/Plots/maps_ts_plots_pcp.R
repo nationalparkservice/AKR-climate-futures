@@ -1,7 +1,7 @@
 var = "Annual.precipIn"
 long.title = "total annual precipitation (in/year)" 
 scale="viridis"
-ratio=1 #aspect ratio for ts - was originally 0.3 but BCR changed to make ts and map only graphs look nicer
+# ratio=1 #aspect ratio for ts - was originally 0.3 but BCR changed to make ts and map only graphs look nicer
 
 # shp = wrst # area is wrst
 
@@ -81,11 +81,11 @@ ts <- ggplot(df, aes(x=Year, y=(eval(parse(text=var))), group=CF, colour = CF)) 
        x = "Year", y = "Total annual precipitation (in/year)") +
   scale_color_manual(name="",values = c("grey", cols)) +
   scale_fill_manual(name="",values = c("grey", cols)) +
-  scale_shape_manual(name="",values = c(21,22,23, 24)) +
-  coord_fixed(ratio = ratio) 
+  scale_shape_manual(name="",values = c(21,22,23, 24))
+  # coord_fixed(ratio = ratio) 
 ts
 
-ggsave(paste0(var,"_ANN_ts.png"), plot = ts, width = 15, height = 5.5, scale = 1, path = plot.dir,bg="white")
+ggsave(paste0(var,"_ANN_ts.png"), plot = ts, width = 15, height = 7, scale = 1, path = plot.dir,bg="white")
 
 
 #### Maps and ts plot

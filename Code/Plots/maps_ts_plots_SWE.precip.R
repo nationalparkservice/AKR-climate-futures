@@ -1,7 +1,7 @@
 var = "SWE.precip"
 long.title = "proportion of precipitation falling as snow" 
 scale="mako"
-ratio=20 #aspect ratio for ts - was originally 30 but BCR changed to make ts only graphs look nicer
+# ratio=20 #aspect ratio for ts - was originally 30 but BCR changed to make ts only graphs look nicer
 
 # shp = wrst # area is wrst
 
@@ -84,11 +84,11 @@ ts <- ggplot(df, aes(x=Year, y=(eval(parse(text=var))), group=CF, colour = CF)) 
        x = "Year", y = "Proportion of precipitation falling as snow") +
   scale_color_manual(name="",values = c("grey",cols)) +
   scale_fill_manual(name="",values = c("grey",cols)) +
-  scale_shape_manual(name="",values = c(21,22,23, 24)) +
-  coord_fixed(ratio = ratio) 
+  scale_shape_manual(name="",values = c(21,22,23, 24))
+  # coord_fixed(ratio = ratio) 
 ts
 
-ggsave(paste0(var,"_ANN_ts.png"), plot = ts, width = 15, height = 6.8, scale = 1, path = plot.dir,bg="white")
+ggsave(paste0(var,"_ANN_ts.png"), plot = ts, width = 15, height = 7, scale = 1, path = plot.dir,bg="white")
 
 
 #### Maps and ts plot
