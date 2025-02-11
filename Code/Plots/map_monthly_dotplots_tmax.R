@@ -29,11 +29,11 @@ SON.cf2 <- readRDS(Filter(function(x) grepl(paste("SON", collapse = "|"), x), CF
 # SON.cf3 <- readRDS(Filter(function(x) grepl(paste("SON", collapse = "|"), x), CF3.ls))
 
 scale.min = min(c(DJF.cf1$mean,MAM.cf1$mean,JJA.cf1$mean,SON.cf1$mean,
-                  DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean),na.rm = TRUE)
+                  DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean),na.rm=TRUE)
                   # DJF.cf3$mean,MAM.cf3$mean,JJA.cf3$mean,SON.cf2$mean),na.rm=TRUE)
 scale.max = max(c(DJF.cf1$mean,MAM.cf1$mean,JJA.cf1$mean,SON.cf1$mean,
-            DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean),na.rm=TRUE)
-            # DJF.cf3$mean,MAM.cf3$mean,JJA.cf3$mean,SON.cf2$mean),na.rm=TRUE)
+                  DJF.cf2$mean,MAM.cf2$mean,JJA.cf2$mean,SON.cf2$mean),na.rm=TRUE)
+                  # DJF.cf3$mean,MAM.cf3$mean,JJA.cf3$mean,SON.cf2$mean),na.rm=TRUE)
 
 # ggplot
 map.plot <- function(data, title,xaxis,metric,col){
@@ -83,8 +83,6 @@ maps.all <- grid_arrange_shared_legend(DJF.cf1.plot,DJF.cf2.plot, # THIS WORKS, 
                                        JJA.cf1.plot,JJA.cf2.plot,
                                        SON.cf1.plot,SON.cf2.plot,
                                        nrow = 4,ncol=2, position = "bottom") 
-# top = textGrob("Change in average annual water balance (in/yr)",
-#                gp=gpar(fontface="bold", col="black", fontsize=20)))
 
 djf <- textGrob("DJF", gp = gpar(fontface="bold", size = 12))
 mam <- textGrob("MAM", gp = gpar(fontface="bold", size = 12))
@@ -98,8 +96,7 @@ maps <- grid.arrange(seasons,maps.all,ncol = 2, widths = c(1,15))
 
 ################################### MONTHLY DOT PLOT ##################
 
-
-dotplot <- ggplot(delta, aes(x=(eval(parse(text=delta.var))),y=season,fill=CF)) +
+dotplot <- ggplot(delta,aes(x=(eval(parse(text=delta.var))),y=season,fill=CF)) +
   geom_vline(xintercept=0, linetype="dashed", color = "black") + 
   geom_point(stat="identity",size=8,colour="black",aes(fill = factor(CF), shape = factor(CF))) +
   theme(axis.text=element_text(size=16),    #Text size for axis tick mark labels
@@ -117,9 +114,62 @@ dotplot <- ggplot(delta, aes(x=(eval(parse(text=delta.var))),y=season,fill=CF)) 
   scale_y_discrete(limits=rev)
 dotplot
 
-g <- grid.arrange(maps, dotplot,ncol = 2, widths = c(6, 4), clip = FALSE)
+g <- grid.arrange(maps, dotplot, ncol = 2, widths = c(6, 4), clip = FALSE)
 
-annotate_figure(g, top = text_grob(paste0("Change in seasonal ",long.title, "; 1950-1999 vs 2025-2055"), 
-                                   face = "bold", size = 20))
+annotate_figure(g, top = text_grob(paste0("Change in seasonal ", long.title, "; 1950-1999 vs 2025-2055"), 
+                                      face = "bold", size = 20))
 
-ggsave(paste0("seasonal_",var,".png"), width = 15, height = 9, path = plot.dir,bg="white")
+ggsave(paste0("seasonal_",var,".png"), plot = g, width = 15, height = 9, path = plot.dir,bg="white")
+
+
+################################### MONTHLY BAR CHART ##################
+
+# Seasons as groups
+
+## Without historical data
+
+barchart <- ggplot(df.fut[-c(9:12),], aes(x=season,y=(eval(parse(text=delta.var))),fill=CF)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_hline(yintercept = 0, linetype="solid", color = "black", size = 0.75) +
+  theme(axis.text=element_text(size=18),    #Text size for axis tick mark labels
+        axis.title.x=element_text(size=22),   #Text size and alignment for x-axis label
+        axis.title.y=element_text(size=22),   #Text size and alignment for y-axis label
+        plot.title=element_blank(),
+        legend.title=element_text(size=18),   #Text size of legend category labels
+        legend.text=element_text(size=17),   #Text size of legend title
+        legend.position = "bottom")  +
+  labs(title = paste0("Seasonal ",long.title), 
+       x = "Season", 
+       y = "Maximum temperature (°F)",
+       fill = "") +
+  scale_fill_manual(name="",values = cols) #+
+barchart
+
+annotate_figure(barchart, top = text_grob(paste0("Seasonal ",long.title, "; 1979-2016 vs 2035-2065"),
+                                          face = "bold", size = 22))
+
+ggsave(paste0("seasonal_",var,"_bar.png"), plot = barchart, width = 15, height = 9, path = plot.dir,bg="white")
+
+## With historical data
+
+barchart <- ggplot(df.fut, aes(x=factor(season, levels = c('DJF', 'MAM', 'JJA', 'SON')), y=(eval(parse(text=delta.var))), fill=factor(CF, levels = c('Historical', 'Climate Future 1', 'Climate Future 2')))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_hline(yintercept = 0, linetype="solid", color = "black", size = 0.75) +
+  theme(axis.text = element_text(size = 18),    # Text size for axis tick mark labels
+        axis.title.x = element_text(size = 22),   # Text size and alignment for x-axis label
+        axis.title.y = element_text(size = 22),   # Text size and alignment for y-axis label
+        plot.title = element_blank(),
+        legend.title = element_text(size = 18),  # Text size of legend category labels
+        legend.text = element_text(size = 17),  # Text size of legend title
+        legend.position = "bottom") +
+  labs(title = paste0("Seasonal ", long.title), 
+       x = "Season", 
+       y = "Maximum temperature (°F)",
+       fill = "") +
+  scale_fill_manual(values = c("Historical" = "grey", "Climate Future 1" = "#6EB2D4", "Climate Future 2" = "#CA0020"))
+barchart
+
+annotate_figure(barchart, top = text_grob(paste0("Seasonal ",long.title, "; 1979-2016 vs 2035-2065"),
+                                          face = "bold", size = 22))
+
+ggsave(paste0("seasonal_",var,"_bar_historical.png"), plot = barchart, width = 15, height = 9, path = plot.dir,bg="white")

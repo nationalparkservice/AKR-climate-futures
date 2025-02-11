@@ -23,12 +23,12 @@ rm(list = ls())
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(ggbiplot)
 
-SiteID <- "CAKR" #*UPDATE*
+SiteID <- "KOVA" #*UPDATE*
 
 data.dir <- "E:/NCAR_AK/met/monthly/BCSD/" 
 vic.dir <- "E:/NCAR_AK/vic_hydro/monthly/BCSD"
 # plot.dir <- paste0("C:/Users/arunyon/3D Objects/Local-files/RCF_Testing/",SiteID) #*UPDATE*
-plot.dir <- paste0("C:/Users/arunyon/OneDrive - DOI/AKR-CFs/",SiteID) #*UPDATE*
+plot.dir <- paste0("C:/Users/brobb/OneDrive - DOI/Projects/AKR_CFs/",SiteID) #*UPDATE*
 
 dir.create(plot.dir,showWarnings=FALSE)
 
@@ -73,8 +73,6 @@ names(Future_Means) <- c("GCM", "RCP", variables)
 
 Deltas <- as.data.frame(matrix(data=NA,nrow=length(GCMs)*length(RCPs),ncol=length(variables)+2))
 names(Deltas) <- c("GCM", "RCP", variables)
-
-
 
 
 ```

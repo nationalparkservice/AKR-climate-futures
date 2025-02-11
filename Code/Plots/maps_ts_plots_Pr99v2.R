@@ -22,7 +22,6 @@ df$Year = as.Date(df$Year,format = "%Y-%m-%d")
 means <- df %>% group_by(CF) %>%
   summarize(var = mean(eval(parse(text=var)))) 
 
-
 # read in RDS for setting scale limits
 cf1 <- readRDS(CF1.ls) 
 cf2 <- readRDS(CF2.ls)
@@ -31,7 +30,8 @@ cf2 <- readRDS(CF2.ls)
 scale.min = min(c(cf1$pcp_in,cf2$pcp_in),na.rm=TRUE)
 scale.max = max(c(cf1$pcp_in,cf2$pcp_in),na.rm=TRUE)
 
-# ggplot
+
+#### Maps plot
 map.plot <- function(data, title,xaxis,metric,col){
   ggplot() + 
     geom_raster(data = ak_df ,aes(x = x, y = y,alpha=HYP_HR_SR_W_1), show.legend=FALSE) +
@@ -46,15 +46,25 @@ map.plot <- function(data, title,xaxis,metric,col){
           legend.key.width = unit(6, "cm"),
           legend.key.height = unit(.3, "cm"),
           legend.justification = "center",
-          plot.title=element_text(size=12,face="bold",hjust=0.5),
-          plot.background = element_rect(colour = col, fill=NA, size=5)) + 
-    labs(fill =long.title)
+          plot.title=element_text(size=14,face="bold",hjust=0.5,margin=margin(t=10)), # added margin argument to lower CF1/2 text above maps
+          plot.background = element_rect(colour = col, fill=NA, size=5),
+          legend.title=element_text(size=11),
+          legend.text=element_text(size=10)) +
+    labs(fill = paste0("Change in ",metric))
 }
 
 cf1.plot <- map.plot(data=readRDS(CF1.ls),title=CFs[1],metric=long.title,col=cols[1])
 cf2.plot <- map.plot(data=readRDS(CF2.ls),title=CFs[2],metric=long.title,col=cols[2])
 # cf3.plot <- map.plot(data=readRDS(CF3.ls),title=CFs[3],metric=long.title,col=cols[3])
 
+maps <- grid_arrange_shared_legend(cf1.plot, cf2.plot,  ncol = 2, nrow = 1, position = "bottom",
+                                   top = textGrob(paste0("Change in ",long.title),
+                                                  gp=gpar(fontface="bold", col="black", fontsize=16)))
+
+ggsave(paste0(var,"_ANN_maps.png"), plot = maps, width = 15, height = 9, scale = 0.65, path = plot.dir,bg="white")
+
+
+#### Time series plot
 ts <- ggplot(df, aes(x=Year, y=(eval(parse(text=var))), group=CF, colour = CF)) +
   
   geom_line(colour = "black",size=2.5, stat = "identity") +
@@ -68,40 +78,39 @@ ts <- ggplot(df, aes(x=Year, y=(eval(parse(text=var))), group=CF, colour = CF)) 
         legend.text=element_text(size=14), legend.title=element_text(size=14),
         legend.position = "bottom") +
   labs(title = paste0("Change in annual ",long.title), 
-       x = "Year", y = long.title) +
+       x = "Year", y = "99th percentile daily precipitation (in/day)") +
   scale_color_manual(name="",values = c(cols,"grey")) +
   scale_fill_manual(name="",values = c(cols,"grey")) +
-  scale_shape_manual(name="",values = c(21,22,23, 24)) 
+  scale_shape_manual(name="",values = c(21,22,23, 24)) +
+  coord_fixed(ratio = ratio)
 ts
 
+ggsave(paste0(var,"_ANN_ts.png"), plot = ts, width = 15, height = 6.8, scale = 1, path = plot.dir,bg="white")
 
-#### Just maps and ts plot
-maps <- grid_arrange_shared_legend(cf1.plot, cf2.plot, ncol = 2, nrow = 1, position = "bottom", 
-                                   top = textGrob(long.title,
-                                                  gp=gpar(fontface="bold", col="black", fontsize=16)))
-# g <- ggarrange(maps,ts, nrow=2)
-# g
 
-#### Maps, ts, table
+#### Maps and ts plot
+g <- ggarrange(maps, ts, nrow=2)
+g
+
+# ggsave(paste0(var,"_ANN_maps_ts.png"), plot = g, width = 15, height = 5.25, scale = 1, path = plot.dir,bg="white")
+
+
+#### Maps, ts, and table plot
 delta.var <- means
 delta.var$var[1:2] <- delta.var$var[1:2] - delta.var$var[3]
 delta.var$var <- signif(delta.var$var, digits = 1)
 
-table <- tableGrob(delta.var, rows = NULL,cols=NULL)
-# table <- gtable_add_grob(table, grobs = rectGrob(gp = gpar(fill=NA, lwd=2)), #library(gtable)
-#                      t=4,b=nrow(table),l=1,r=ncol(table))
+table <- tableGrob(delta.var, rows = NULL, cols=NULL)
 table <- annotate_figure(table,
                 top = text_grob("Historical = absolute value \n CFs = change values", color = "black",
                                  face = "italic", size = 12))
-tsplots <- grid.arrange(ts, table,ncol = 2, widths = c(4, 1), clip = FALSE)
+# ggsave(paste0(var,"_ANN_ts_table.png"), plot = table, width = 15, height = 5, scale = 1, path = plot.dir,bg="white")
 
+tsplots <- grid.arrange(ts, table, ncol = 2, widths = c(4,1), clip = FALSE)
+# ggsave(paste0(var,"_ANN_ts_plots.png"), plot = tsplots, width = 15, height = 5, scale = 1, path = plot.dir,bg="white")
 
-g <- ggarrange(maps,tsplots, nrow=2)
+g <- ggarrange(maps, tsplots, nrow=2)
 g
 
-
 ggsave(paste0(var,"_ANN.png"), width = 15, height = 9, path = plot.dir,bg="white")
-
-
-
 
