@@ -95,6 +95,8 @@ Run PCA and create scatterplots for T1 variables
 ```{r Run PCA}
 # Run scatterplot
 ## REDO PLOT AND MULTIPLY PCP BY 30 
+# Baseline_Means <- read.csv(paste0(DataOut,"/Baseline_Means.csv"))
+# Future_Means <- read.csv(paste0(DataOut,"/Future_Means.csv"))
 Deltas <- read.csv(paste0(DataOut,"/Deltas.csv"))
 
 PlotWidth = 15
