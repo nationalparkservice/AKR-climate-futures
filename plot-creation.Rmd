@@ -14,7 +14,7 @@ rm(list = ls())
 
 library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis);library(here);library(ggrepel);library(rlang);library(units); library(tidyr); library(lemon);library(ggpubr);library(gridExtra);library(grid); library(gtable); library(lubridate);library(terra);library(raster)
 
-SiteID <- "NOAT"
+SiteID <- "KOVA" #*UPDATE*
 
 base.dir = paste0("C:/Users/brobb/OneDrive - DOI/Projects/AKR_CFs/",SiteID) #*UPDATE*
 data.dir = paste0(base.dir,"/Data")
@@ -129,3 +129,8 @@ source(here::here("Code", "Plots", "maps_ts_plots_soil.temp.R"),echo = FALSE)
 ```{r SWE.precip.maps, include=FALSE, results=hide, eval=TRUE}
 #source(here::here("Code", "Plots", "SWE.precip.maps.R"),echo = FALSE)
 ```
+
+```{r metrics table, include=FALSE, results=hide, eval=TRUE}
+  source(here::here("Code", "Plots", "climate-futures-table.R"),echo = FALSE)
+```
+
