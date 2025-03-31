@@ -16,7 +16,7 @@ library(stars);library(dplyr);library(ggplot2);library(ggthemes);library(viridis
 
 SiteID <- "KOVA" #*UPDATE*
 
-base.dir = paste0("C:/Users/brobb/OneDrive - DOI/Projects/AKR_CFs/",SiteID) #*UPDATE*
+base.dir = paste0("C:/Users/arunyon/OneDrive - DOI/AKR-CFs/",SiteID) #*UPDATE*
 data.dir = paste0(base.dir,"/Data")
 plot.dir = paste0(base.dir,"/Figures")
 # plot.dir = "./Data/figures"
@@ -131,6 +131,6 @@ source(here::here("Code", "Plots", "maps_ts_plots_soil.temp.R"),echo = FALSE)
 ```
 
 ```{r metrics table, include=FALSE, results=hide, eval=TRUE}
-  source(here::here("Code", "Plots", "climate-futures-table.R"),echo = FALSE)
+  source(here::here("Code", "Plots", "climate-futures-table_v2.R"),echo = FALSE)
 ```
 
