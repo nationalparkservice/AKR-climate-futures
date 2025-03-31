@@ -152,8 +152,7 @@ report.output$CFTmean <- as.vector(t(merged_transpose_deltas[2,2:3]))
 report.output$CFPr <- as.vector(t(merged_transpose_deltas[1,2:3]))
 report.output$`CFPr%` <- (report.output$CFPr/merged$Annual.precipIn[1])*100
 
-as.vector(t(merged_transpose_deltas[2,2:3]))
-
+write.csv(report.output,paste0(data.dir,"/","CF_summary_output.csv"))
 
 
 rm(annual.final, combined, daily.met, daily.met.avg, daily.met.final, data_list, 
