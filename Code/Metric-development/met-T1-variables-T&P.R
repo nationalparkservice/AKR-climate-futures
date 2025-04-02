@@ -115,13 +115,13 @@ for (G in 1:length(GCMs)){
     
     mean_hist <- st_apply(hist_var_stars, c("x", "y"), mean) # find mean
     mean_fut <- st_apply(fut_var_stars, c("x", "y"), mean)
-    delta <- mean_fut - mean_hist
+    # delta <- mean_fut - mean_hist
     
     
     #### Add values to Means dfs
     Baseline_Means$Tmean_F[index] = mean(mean_hist$mean, na.rm=TRUE)
     Future_Means$Tmean_F[index] = mean(mean_fut$mean, na.rm=TRUE)
-    Deltas$Tmean_F[index] = mean(delta$mean, na.rm=TRUE)
+    # Deltas$Tmean_F[index] = mean(delta$mean, na.rm=TRUE)
     
     
     # # ggplot - delta
@@ -165,13 +165,13 @@ for (G in 1:length(GCMs)){
     
     sum_hist <- st_apply(hist_var_stars, c("x", "y"), FUN=function(x) sum(x)/length(historical.period)) # find sum
     sum_fut <- st_apply(fut_var_stars, c("x", "y"), FUN=function(x) sum(x)/length(future.period))
-    delta <- sum_fut - sum_hist
+    # delta <- sum_fut - sum_hist
     
     
     #### Add values to Means dfs
     Baseline_Means$Precip_in[index] = mean(sum_hist$pcp_in, na.rm=TRUE)
     Future_Means$Precip_in[index] = mean(sum_fut$pcp_in, na.rm=TRUE)
-    Deltas$Precip_in[index] = mean(delta$pcp_in, na.rm=TRUE)
+    # Deltas$Precip_in[index] = mean(delta$pcp_in, na.rm=TRUE)
     
     
     # # ggplot - delta
@@ -194,6 +194,85 @@ for (G in 1:length(GCMs)){
   gc()
   }
 }
+
+###############################
+##### Daymet data
+print("extracting Daymet")
+grid_filelist = list.files(path = "E:/NCAR_AK/met/monthly/daymet", pattern= '.nc', full.names = TRUE)
+grid_filelist = Filter(function(x) grepl(paste(daymet.period, collapse = "|"), x), grid_filelist)
+
+# DAYMET ----
+
+l <- list() # Create a list to put the stars objects into
+
+for(i in 1:length(grid_filelist)){
+  invisible(capture.output(
+    suppressWarnings(
+      l[[i]] <- read_stars(grid_filelist[i], curvilinear = c("longitude", "latitude")) # need to read in as ncdf or coordinate system does not translate (not sure why)
+    )))
+}
+
+# Crop
+
+cropped_grid <- list() # create list for cropped stars objects
+
+for(i in 1:length(l)){ # add cropped stars objects to a new list
+  nc = l[[i]]
+  nc = st_transform(nc, st_crs(shp))
+  nc_crop = nc[shp]
+  cropped_grid[[i]] = nc_crop
+}
+
+cropped_st_grid <- list()
+
+for(i in 1:length(cropped_grid)){
+  cropped_st_grid[[i]] <- st_as_stars(cropped_grid[[i]])
+}
+# assign(paste0("cropped_st_grid_",GCMs[G]), cropped_st_grid)
+saveRDS(cropped_st_grid, file = paste(data.dir,"cropped_st_Daymet",sep="/"))
+
+#Tmean
+var = "Tmean (F)"
+grid_var <- list()
+
+for(H in 1:length(cropped_st_grid)){
+  s = cropped_st_grid[[H]]
+  s %>% mutate(tmean = (tmax + tmin)/2) -> s 
+  s = select(s, tmean)
+  grid_var[[H]] = s[,,,] #all months
+}
+
+grid_var_stars <- Reduce(c, grid_var)
+grid_var_stars$tmean <- units::drop_units(grid_var_stars$tmean)
+grid_var_stars %>% mutate(tmean_f = tmean * 9/5 + 32) %>% select(tmean_f) -> grid_var_stars
+
+mean_grid <- st_apply(grid_var_stars, c("x", "y"), mean)
+Daymet_Means[3] = mean(mean_grid$mean, na.rm=TRUE)
+
+# Precip
+var = var = "Precip (in)"
+grid_var <- list()
+
+for(H in 1:length(cropped_st_grid)){
+  s = cropped_st_grid[[H]]
+  s = select(s, pcp)
+  grid_var[[H]] = s[,,,] #all months
+}
+
+grid_var_stars <- Reduce(c, grid_var)
+grid_var_stars$pcp <- units::drop_units(grid_var_stars$pcp)
+grid_var_stars %>% mutate(pcp_in = pcp / 25.4) %>% select(pcp_in) -> grid_var_stars
+
+sum_grid <- st_apply(grid_var_stars, c("x", "y"), FUN=function(x) sum(x)/length(daymet.period)) # find sum
+Daymet_Means[4] = mean(sum_grid$pcp_in, na.rm=TRUE)
+
+Daymet_Means[1] = "gridmet"
+Daymet_Means[2] = "gridmet"
+
+# delta <- mean_fut - mean_hist
+Deltas$Tmean_F = Future_Means$Tmean_F - Daymet_Means$Tmean_F
+Deltas$Precip_in = Future_Means$Precip_in - Daymet_Means$Precip_in
+
 
 rm(cropped_fut, cropped_hist, cropped_st_fut, cropped_st_hist,l,nc,nc_crop,s)
 gc()
