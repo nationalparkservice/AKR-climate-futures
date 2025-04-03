@@ -169,7 +169,7 @@ barchart <- ggplot(df.fut, aes(x=factor(season, levels = c('DJF', 'MAM', 'JJA', 
   scale_fill_manual(values = c("Historical" = "grey", "Climate Future 1" = "#6EB2D4", "Climate Future 2" = "#CA0020"))
 barchart
 
-annotate_figure(barchart, top = text_grob(paste0("Seasonal ",long.title, "; 1979-2016 vs 2035-2065"),
+annotate_figure(barchart, top = text_grob(paste0("Seasonal ",long.title),
                                           face = "bold", size = 22))
 
 ggsave(paste0("seasonal_",var,"_bar_historical.png"), plot = barchart, width = 15, height = 9, path = plot.dir,bg="white")

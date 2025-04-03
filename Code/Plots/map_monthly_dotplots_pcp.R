@@ -116,7 +116,7 @@ dotplot
 
 g <- grid.arrange(maps, dotplot, ncol = 2, widths = c(6, 4), clip = FALSE)
 
-annotate_figure(g, top = text_grob(paste0("Change in seasonal ", long.title, "; 1950-1999 vs 2025-2055"), 
+annotate_figure(g, top = text_grob(paste0("Change in seasonal ", long.title), 
                                       face = "bold", size = 20))
 
 ggsave(paste0("seasonal_",var,".png"), plot = g, width = 15, height = 9, path = plot.dir,bg="white")
