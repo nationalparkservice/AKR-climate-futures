@@ -153,7 +153,14 @@ report.output$CFPr <- as.vector(t(merged_transpose_deltas[1,2:3])) # #s differ f
 report.output$`CFPr%` <- (report.output$CFPr/merged$Annual.precipIn[1])*100
 
 ### # SWE table - SWE on, SWE off, mean SWE, peak SWE
+swe.data <- read.csv(paste0(data.dir,"/SWE.metrics.csv")) # Read in deltas file for all CFs
+swe.aggregate <- aggregate(as.matrix(swe.data[4:8])~CF,swe.data,mean)
 
+swe.delta <- swe.aggregate %>%
+  mutate(across(-CF, ~ . - swe.aggregate[swe.aggregate$CF == "Historical", ][[cur_column()]])) |> 
+  filter(CF != "Historical") 
+
+report.output <- left_join(report.output,swe.delta,by="CF")
 write.csv(report.output,paste0(data.dir,"/","CF_summary_output.csv"))
 
 
