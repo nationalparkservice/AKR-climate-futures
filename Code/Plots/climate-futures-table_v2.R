@@ -58,7 +58,7 @@ annual <- combined %>%
   summarize(across(everything(), ~ first(na.omit(.))), .groups = "drop")
 
 # Average by GCM
-annual.avg <- annual %>%
+annual.avg <- annual %>% ## WARNING because GCM field is not numeric
   group_by(GCM) %>%
   summarize(across(everything(), mean, na.rm = TRUE))
 
@@ -141,18 +141,23 @@ report.output = data.frame(matrix(nrow = 2, ncol = length(columns)))
 colnames(report.output) = columns
 report.output$CF <- CFs
 
-all.deltas <- read.csv(paste0(data.dir,"/Deltas.csv"))
-report.output$FullRangeTmean[1] <- min(all.deltas$Tmean_F)
+all.deltas <- read.csv(paste0(data.dir,"/Deltas.csv")) # Read in deltas file for all CFs
+report.output$FullRangeTmean[1] <- min(all.deltas$Tmean_F) 
 report.output$FullRangeTmean[2] <- max(all.deltas$Tmean_F)
-report.output$FullRangePr[1] <- min(all.deltas$Precip_in)*12
-report.output$FullRangePr[2] <- max(all.deltas$Precip_in)*12
-report.output$`FullRangePr%`[1] <- (min(all.deltas$Precip_in*12)/merged$Annual.precipIn[1])*100
-report.output$`FullRangePr%`[2] <- (max(all.deltas$Precip_in*12)/merged$Annual.precipIn[1])*100
-report.output$CFTmean <- as.vector(t(merged_transpose_deltas[2,2:3]))
-report.output$CFPr <- as.vector(t(merged_transpose_deltas[1,2:3]))
+report.output$FullRangePr[1] <- min(all.deltas$Precip_in)*30
+report.output$FullRangePr[2] <- max(all.deltas$Precip_in)*30
+report.output$`FullRangePr%`[1] <- (min(all.deltas$Precip_in)/merged$Annual.precipIn[1])*100
+report.output$`FullRangePr%`[2] <- (max(all.deltas$Precip_in)/merged$Annual.precipIn[1])*100
+report.output$CFTmean <- as.vector(t(merged_transpose_deltas[2,2:3])) # #s differ from full range
+report.output$CFPr <- as.vector(t(merged_transpose_deltas[1,2:3])) # #s differ from full range
 report.output$`CFPr%` <- (report.output$CFPr/merged$Annual.precipIn[1])*100
 
+### # SWE table - SWE on, SWE off, mean SWE, peak SWE
+
 write.csv(report.output,paste0(data.dir,"/","CF_summary_output.csv"))
+
+
+
 
 
 rm(annual.final, combined, daily.met, daily.met.avg, daily.met.final, data_list, 
